@@ -82,14 +82,14 @@ final class OneDriveApi
 
 	bool authorize()
 	{
-		import std.stdio, std.regex;
-		char[] response = environment.get(envAuthCode);
+		import std.stdio, std.regex, std.process;
+		string response = environment.get(envAuthCode);
 		if (response is null)
 		{		
 			string url = authUrl ~ "?client_id=" ~ clientId ~ "&scope=files.readwrite%20files.readwrite.all%20offline_access&response_type=code&redirect_uri=" ~ redirectUrl;
 			log.log("Authorize this app visiting:\n");
 			write(url, "\n\n", "Enter the response uri: ");
-			readln(response);
+			response = readln();
 		}
 		// match the authorization code
 		auto c = matchFirst(response, r"(?:[\?&]code=)([\w\d-]+)");
