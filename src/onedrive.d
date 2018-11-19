@@ -10,6 +10,7 @@ static import log;
 shared bool debugResponse = false;
 
 private immutable {
+	string envAuthCode = "ONEDRIVE_AUTH_CODE";
 	string clientId = "22c49a0d-d21c-4792-aed1-8f163c982546";
 	string authUrl = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize";
 	string redirectUrl = "https://login.microsoftonline.com/common/oauth2/nativeclient";
@@ -82,11 +83,14 @@ final class OneDriveApi
 	bool authorize()
 	{
 		import std.stdio, std.regex;
-		char[] response;
-		string url = authUrl ~ "?client_id=" ~ clientId ~ "&scope=files.readwrite%20files.readwrite.all%20offline_access&response_type=code&redirect_uri=" ~ redirectUrl;
-		log.log("Authorize this app visiting:\n");
-		write(url, "\n\n", "Enter the response uri: ");
-		readln(response);
+		char[] response = environment.get(envAuthCode);
+		if (response is null)
+		{		
+			string url = authUrl ~ "?client_id=" ~ clientId ~ "&scope=files.readwrite%20files.readwrite.all%20offline_access&response_type=code&redirect_uri=" ~ redirectUrl;
+			log.log("Authorize this app visiting:\n");
+			write(url, "\n\n", "Enter the response uri: ");
+			readln(response);
+		}
 		// match the authorization code
 		auto c = matchFirst(response, r"(?:[\?&]code=)([\w\d-]+)");
 		if (c.empty) {
